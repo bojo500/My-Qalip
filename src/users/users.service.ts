@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { CoreService } from "../../libs/core/src";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "./entities/user.entity";
+import { AuthService } from "../auth/auth.service";
+import { CreateUserDto, UpdateUserDto } from "./dto";
 
 @Injectable()
-export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+export class UsersService extends CoreService {
+  constructor(
+    @InjectRepository(User) public repository: Repository<User>,
+    @Inject(forwardRef(() => AuthService)) private authService: AuthService,
+  ) {
+    super(repository);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const user = await this.repository.save(createUserDto);
+    if (!user) {
+      throw new BadRequestException();
+    }
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneByUsername(username: string): Promise<User> {
+    return this.repository.findOne({ userName: username });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findOneByEmail(email: string): Promise<User> {
+    return this.repository.findOne({ email });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async updateProfile(token: string, updateUserDto: UpdateUserDto): Promise<any> {
+    const { sub: id } = await this.authService.checkAuth(token);
+    return this.update(id, updateUserDto);
+  }
+
+  async getProfile(token: string): Promise<User> {
+    const { sub: id } = await this.authService.checkAuth(token);
+    let user: User;
+    try {
+      user = await this.repository.findOne(id);
+    } catch (e) {
+      throw new NotFoundException();
+    }
+    delete user.password;
+    return user;
   }
 }

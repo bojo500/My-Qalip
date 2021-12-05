@@ -8,9 +8,9 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { AuthService } from './auth.service';
-import { Users } from '../users/entities/users.entity';
 import { LocalAuthGuard } from "./guards";
 import { ForgetPasswordDto, RegisterDto } from "./dto";
+import { User } from "../users/entities/user.entity";
 
 @Controller('auth')
 export class AuthController {
@@ -23,7 +23,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  public async login(@Request() req, @Body() body): Promise<Users> {
+  public async login(@Request() req, @Body() body): Promise<User> {
     return this.authService.login(req.user);
   }
 
@@ -33,7 +33,7 @@ export class AuthController {
    */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  public async register(@Body() userData: RegisterDto): Promise<Users> {
+  public async register(@Body() userData: RegisterDto): Promise<User> {
     return this.authService.register(userData);
   }
 

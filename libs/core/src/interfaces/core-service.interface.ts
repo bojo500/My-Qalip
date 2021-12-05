@@ -1,4 +1,4 @@
-import { CoreEntity } from "@resume/core/core.entity";
+import { CoreEntity } from "../core.entity";
 
 export abstract class CoreServiceInterface {
   abstract create(payload: any): Promise<any>;

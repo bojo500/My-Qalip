@@ -1,21 +1,21 @@
 import { BadRequestException, forwardRef, HttpStatus, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
-import { Users } from "../users/entities/users.entity";
-import * as bcrypt from "bcrypt";
-import { RegisterDto } from "./dto/register.dto";
-import { JwtService } from "@nestjs/jwt";
 import { TokenPayloadInterface } from "./interfaces";
+import { User } from "../users/entities/user.entity";
+import { JwtService } from "@nestjs/jwt";
+import { RegisterDto } from "./dto";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
-    private jwtService: JwtService,
+    private jwtService: JwtService
   ) {
   }
 
-  async validateUser(email: string, password: string): Promise<Users> {
-    const user: Users = await this.usersService.findOneByEmail(email);
+  async validateUser(email: string, password: string): Promise<User> {
+    const user: User = await this.usersService.findOneByEmail(email);
     if (user) {
       const isPasswordCorrect = await bcrypt.compare(password, user?.password);
       if (isPasswordCorrect) {
@@ -34,13 +34,13 @@ export class AuthService {
       throw new BadRequestException(e);
     }
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload)
     };
   }
 
-  async register(user: RegisterDto): Promise<Users> {
-    const _user: Users = await this.usersService.findOneByEmail(user?.email);
-    const _userName: Users = await this.usersService.findOneByUsername(user?.userName);
+  async register(user: RegisterDto): Promise<User> {
+    const _user: User = await this.usersService.findOneByEmail(user?.email);
+    const _userName: User = await this.usersService.findOneByUsername(user?.userName);
     if (_user || _userName) {
       this.handleBadRequest("Email or username already exists");
     }
@@ -51,15 +51,15 @@ export class AuthService {
   handleBadRequest(message: string): void {
     throw new BadRequestException({
       message,
-      statusCode: HttpStatus.BAD_REQUEST,
+      statusCode: HttpStatus.BAD_REQUEST
     });
   }
 
   /**
    *   forget password function
    */
-  async forgotPassword(email: string): Promise<Users> {
-    const user: Users = await this.usersService.findOneByEmail(email);
+  async forgotPassword(email: string): Promise<User> {
+    const user: User = await this.userService.findOneByEmail(email);
 
     return user;
   }
