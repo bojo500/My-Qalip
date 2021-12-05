@@ -9,8 +9,8 @@ import {
 } from "@nestjs/common";
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from "./guards";
-import { ForgetPasswordDto, RegisterDto } from "./dto";
-import { User } from "../users/entities/user.entity";
+import {  RegisterDto } from "./dto";
+import { User } from "../users/entities";
 
 @Controller('auth')
 export class AuthController {
@@ -37,14 +37,5 @@ export class AuthController {
     return this.authService.register(userData);
   }
 
-  /**
-   * to get the forgot Password
-   * @param forgotPasswordDto
-   */
-  @Post('forgot/password')
-  @HttpCode(HttpStatus.OK)
-  async forgotPassword(@Body() forgotPasswordDto: ForgetPasswordDto) {
-    return this.authService.forgotPassword(forgotPasswordDto.email);
-  }
 
 }

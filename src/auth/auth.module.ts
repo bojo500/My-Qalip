@@ -10,15 +10,15 @@ import { ConfigService } from "../config/config.service";
 
 @Module({
   imports: [
-    PassportModule,
     ConfigModule,
+    PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.jwtSecret,
-        signOptions: { expiresIn: "30d" },
+        signOptions: { expiresIn: configService.jwtExpiresIn }
       }),
-      inject: [ConfigService],
+      inject: [ConfigService]
     }),
     forwardRef(() => UsersModule),
   ],

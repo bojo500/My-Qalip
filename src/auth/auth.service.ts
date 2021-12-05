@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, HttpStatus, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import { TokenPayloadInterface } from "./interfaces";
-import { User } from "../users/entities/user.entity";
+import { User } from "../users/entities";
 import { JwtService } from "@nestjs/jwt";
 import { RegisterDto } from "./dto";
 import * as bcrypt from "bcrypt";
@@ -55,14 +55,6 @@ export class AuthService {
     });
   }
 
-  /**
-   *   forget password function
-   */
-  async forgotPassword(email: string): Promise<User> {
-    const user: User = await this.userService.findOneByEmail(email);
-
-    return user;
-  }
 
   async checkAuth(token: string): Promise<TokenPayloadInterface> {
     let verifyObject: TokenPayloadInterface;

@@ -2,7 +2,7 @@ import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException 
 import { CoreService } from "../../libs/core/src";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "./entities/user.entity";
+import { User } from "./entities";
 import { AuthService } from "../auth/auth.service";
 import { CreateUserDto, UpdateUserDto } from "./dto";
 
