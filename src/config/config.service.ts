@@ -25,27 +25,29 @@ export class ConfigService {
   }
 
   /**
-   * Validate ${NODE_ENV}..env file
-   * @param envConfig environment variables specified in ${NODE_ENV}..env file
+   * Validate ${NODE_ENV}.dev.env file
+   * @param envConfig environment variables specified in ${NODE_ENV}.dev.env file
    */
   static validateInput(envConfig: EnvConfig): EnvConfig {
     const envVarsSchema: Joi.ObjectSchema = Joi.object({
-      PORT: Joi.number().default(3000),
       DB_TYPE: Joi.string().required(),
-      DB_NAME: Joi.string().required(),
-      DB_HOST: Joi.string().default("localhost"),
+      DB_HOST: Joi.string().required(),
+      DB_PORT: Joi.number().required(),
       DB_USERNAME: Joi.string().required(),
       DB_PASSWORD: Joi.string().required(),
-      DB_PORT: Joi.number().default(5432),
+      DB_NAME: Joi.string().required(),
+      CHARSET: Joi.string().required(),
       ENTITIES: Joi.string().required(),
-      SEEDS: Joi.string().required(),
       FACTORIES: Joi.string().required(),
+      SEEDS: Joi.string().required(),
       SUBSCRIBERS: Joi.string().required(),
+      APP_PORT: Joi.number().required(),
       SYNCHRONIZE: Joi.boolean(),
-      DATA_ENTITIES: Joi.string(),
       JWT_SECRET: Joi.string().required(),
-      JWT_EXPIRES_IN: Joi.string(),
-      DATA_JWT_SECRET: Joi.string().required()
+      MAIL_HOST: Joi.string(),
+      MAIL_USER: Joi.string(),
+      MAIL_PASSWORD: Joi.string(),
+      SENDGRID_API_KEY: Joi.string().required(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(envConfig, envVarsSchema);
@@ -54,13 +56,28 @@ export class ConfigService {
     }
     return validatedEnvConfig;
   }
+  get mailHost():string {
+    return this.envConfig.MAIL_HOST;
+  }
 
-  /**
-   * Property Getters
-   */
+  get mailUser():string {
+    return this.envConfig.MAIL_USER;
+  }
+
+  get mailPassword():string {
+    return this.envConfig.MAIL_PASSWORD;
+  }
+
+  get mailForm():string {
+    return this.envConfig.SENDGRID_API_KEY;
+  }
 
   get databaseSynchronize(): boolean {
     return this.envConfig.SYNCHRONIZE || false;
+  }
+
+  get charset(): string {
+    return this.envConfig.CHARSET;
   }
 
   get appDatabaseType(): "mysql" | "mariadb" {
@@ -68,16 +85,11 @@ export class ConfigService {
   }
 
   get appPort(): string {
-    return this.envConfig.PORT;
+    return this.envConfig.APP_PORT;
   }
 
   get jwtSecret(): string {
     return this.envConfig.JWT_SECRET;
-  }
-
-
-  get JWT_SECRET(): string {
-    return this.envConfig.DATA_JWT_SECRET;
   }
 
   get jwtExpiresIn(): number {
@@ -94,10 +106,6 @@ export class ConfigService {
 
   get entities(): string[] {
     return [this.envConfig.ENTITIES];
-  }
-
-  get dataEntities(): string[] {
-    return [this.envConfig.DATA_ENTITIES];
   }
 
   get seeds(): string[] {
@@ -124,8 +132,5 @@ export class ConfigService {
     return Number(this.envConfig.DB_PORT);
   }
 
-  get charset(): string {
-    return this.envConfig.CHARSET;
-  }
 
 }
